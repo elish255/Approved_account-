@@ -27,6 +27,7 @@
       padding: 30px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative;
     }
 
     h1 {
@@ -66,10 +67,53 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
     .btn:hover {
       background-color: #a00000;
+    }
+
+    .btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+
+    /* Loading Spinner Styles */
+    .spinner-overlay {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.8);
+      z-index: 100;
+      border-radius: 10px;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid darkred;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .spinner-text {
+      font-size: 16px;
+      color: darkred;
+      font-weight: bold;
     }
 
     /* Modal Styles */
@@ -128,6 +172,11 @@
   <div class="navbar">Videofunds</div>
 
   <div class="container">
+    <div class="spinner-overlay" id="spinnerOverlay">
+      <div class="spinner"></div>
+      <div class="spinner-text">Processing your withdrawal...</div>
+    </div>
+
     <h1>Congratulations! Your Account is Now Approved for Withdrawal</h1>
 
     <h2>Please Enter Amount you want to Withdrawal</h2>
@@ -135,15 +184,14 @@
     <form id="withdrawForm">
       <label for="amount">Amount (Max 7 digits):</label>
       <input
-  type="text"
-  id="amount"
-  name="amount"
-  required
-  pattern="^[\d,]{1,11}$"
-  title="Enter a valid amount (up to 7 digits)"
-  placeholder="Enter amount"
-/>
-
+        type="text"
+        id="amount"
+        name="amount"
+        required
+        pattern="^[\d,]{1,11}$"
+        title="Enter a valid amount (up to 7 digits)"
+        placeholder="Enter amount"
+      />
 
       <label for="phone">Enter Phone Number:</label>
       <input
@@ -156,7 +204,7 @@
         placeholder="+255XXXXXXXXX"
       />
 
-      <button type="submit" class="btn">Confirm</button>
+      <button type="submit" class="btn" id="confirmBtn">Confirm</button>
     </form>
   </div>
 
@@ -173,40 +221,59 @@
   </div>
 
   <script>
-  const form = document.getElementById('withdrawForm');
-  const modal = document.getElementById('successModal');
-  const amountInput = document.getElementById('amount');
+    const form = document.getElementById('withdrawForm');
+    const modal = document.getElementById('successModal');
+    const amountInput = document.getElementById('amount');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const spinnerOverlay = document.getElementById('spinnerOverlay');
 
-  // Format number with commas
-  function formatNumberWithCommas(value) {
-    const digitsOnly = value.replace(/\D/g, "");
-    return digitsOnly.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-
-  // Update input as user types
-  amountInput.addEventListener('input', () => {
-    const cursorPosition = amountInput.selectionStart;
-    const digitsOnly = amountInput.value.replace(/\D/g, "");
-    const formatted = formatNumberWithCommas(digitsOnly);
-    amountInput.value = formatted;
-  });
-
-  // Handle form submission
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    if (form.checkValidity()) {
-      modal.style.display = 'block';
+    // Format number with commas
+    function formatNumberWithCommas(value) {
+      const digitsOnly = value.replace(/\D/g, "");
+      return digitsOnly.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
-  });
 
-  // Allow clicking outside modal to close
-  window.onclick = function(event) {
-    if (event.target == modal) {
-      modal.style.display = 'none';
-      form.reset();
+    // Update input as user types
+    amountInput.addEventListener('input', () => {
+      const cursorPosition = amountInput.selectionStart;
+      const digitsOnly = amountInput.value.replace(/\D/g, "");
+      const formatted = formatNumberWithCommas(digitsOnly);
+      amountInput.value = formatted;
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      if (form.checkValidity()) {
+        // Disable the button to prevent multiple clicks
+        confirmBtn.disabled = true;
+        
+        // Show the loading spinner
+        spinnerOverlay.style.display = 'flex';
+        
+        // Simulate processing delay (2 seconds)
+        setTimeout(function() {
+          // Hide the spinner
+          spinnerOverlay.style.display = 'none';
+          
+          // Show the success modal
+          modal.style.display = 'block';
+          
+          // Re-enable the button
+          confirmBtn.disabled = false;
+        }, 2000);
+      }
+    });
+
+    // Allow clicking outside modal to close
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+        form.reset();
+      }
     }
-  }
-</script>
+  </script>
 
 </body>
 </html>
